@@ -1,5 +1,6 @@
 package com.example.SimpleManagementSystembackend.sys.controller;
 
+import com.example.SimpleManagementSystembackend.common.vo.Result;
 import com.example.SimpleManagementSystembackend.sys.entity.User;
 import com.example.SimpleManagementSystembackend.sys.service.IUserService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,9 +27,9 @@ public class UserController {
     private IUserService userService;
 
     @GetMapping("/all")
-    public List<User> getAllUser() {
+    public Result<List<User>> getAllUser() {
         List<User> list = userService.list();
-        return list;
+        return Result.success(list, "Select success!");
     }
 
 }
