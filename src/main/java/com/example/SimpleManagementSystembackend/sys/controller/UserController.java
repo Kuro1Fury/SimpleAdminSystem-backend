@@ -6,6 +6,7 @@ import com.example.SimpleManagementSystembackend.common.vo.Result;
 import com.example.SimpleManagementSystembackend.sys.entity.User;
 import com.example.SimpleManagementSystembackend.sys.service.IUserService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.stereotype.Controller;
@@ -30,6 +31,9 @@ public class UserController {
 
     @Autowired
     private IUserService userService;
+
+    @Autowired
+    private PasswordEncoder passwordEncoder;
 
     @GetMapping("/all")
     public Result<List<User>> getAllUser() {
@@ -73,6 +77,8 @@ public class UserController {
         LambdaQueryWrapper<User> wrapper = new LambdaQueryWrapper<>();
         wrapper.eq(StringUtils.hasLength(username), User::getUsername, username);
         wrapper.eq(StringUtils.hasLength(phone), User::getPhone, phone);
+        // Sort by update time
+        wrapper.orderByDesc(User::getId);
 
         Page<User> page = new Page<>(pageNo, pageSize);
         userService.page(page, wrapper);
@@ -82,6 +88,34 @@ public class UserController {
         data.put("rows", page.getRecords());
 
         return Result.success(data);
+    }
+
+    @PostMapping
+    public Result<?> addUser(@RequestBody User user) {
+        // Encrypt the password
+        user.setPassword(passwordEncoder.encode(user.getPassword()));
+        userService.save(user);
+        return Result.success("Add success!");
+    }
+
+    @PutMapping
+    public Result<?> updateUser(@RequestBody User user) {
+        // Encrypt the password
+        user.setPassword(null);
+        userService.updateById(user);
+        return Result.success("Edit success!");
+    }
+
+    @GetMapping("/{id}")
+    public Result<User> getUserById(@PathVariable("id") Integer id) {
+        User user = userService.getById(id);
+        return Result.success(user);
+    }
+
+    @DeleteMapping("/{id}")
+    public Result<User> deleteUserById(@PathVariable("id") Integer id) {
+        userService.removeById(id);
+        return Result.success("Delete success!");
     }
 
 }
