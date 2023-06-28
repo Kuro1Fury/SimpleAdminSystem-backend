@@ -43,7 +43,7 @@ public class UserController {
         return Result.fail(20002, "Username or Password failed!");
     }
 
-    @GetMapping("info")
+    @GetMapping("/info")
     public Result<Map<String, Object>> getUserInfo(@RequestParam("token") String token) {
         // Get the user information by token from Redis
         Map<String, Object> data = userService.getUserInfo(token);
@@ -52,6 +52,12 @@ public class UserController {
             return Result.success(data);
         }
         return Result.fail(20003, "login expired, please login again!");
+    }
+
+    @PostMapping("/logout")
+    public Result<?> logout(@RequestHeader("X-Token") String token) {
+        userService.logout(token);
+        return Result.success("Logout success!");
     }
 
 }

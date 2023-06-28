@@ -75,4 +75,9 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
 
         return null;
     }
+
+    @Override
+    public void logout(String token) {
+        redisTemplate.delete(token);
+    }
 }
