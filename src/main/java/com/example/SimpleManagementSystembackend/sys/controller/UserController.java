@@ -21,6 +21,7 @@ import java.util.Map;
  */
 @RestController
 @RequestMapping("/user")
+//@CrossOrigin // Allow cross-domain requests
 public class UserController {
 
     @Autowired
