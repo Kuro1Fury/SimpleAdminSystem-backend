@@ -1,5 +1,6 @@
 package com.example.SimpleManagementSystembackend.sys.service.impl;
 
+import com.alibaba.fastjson2.JSON;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.example.SimpleManagementSystembackend.sys.entity.User;
 import com.example.SimpleManagementSystembackend.sys.mapper.UserMapper;
@@ -10,6 +11,7 @@ import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
@@ -49,6 +51,25 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
             // return the token
             Map<String, Object> data = new HashMap<>();
             data.put("token", key);
+            return data;
+        }
+
+        return null;
+    }
+
+    @Override
+    public Map<String, Object> getUserInfo(String token) {
+        // Get the user information by token from Redis
+        Object obj = redisTemplate.opsForValue().get(token);
+        // Deserialize the user information
+        if (obj != null) {
+            User loginUser = JSON.parseObject(JSON.toJSONString(obj), User.class);
+            Map<String, Object> data = new HashMap<>();
+            data.put("name", loginUser.getUsername());
+            data.put("avatar", loginUser.getAvatar());
+
+            List<String> roleList = this.baseMapper.getRoleNameByUserId(loginUser.getId());
+            data.put("roles", roleList);
             return data;
         }
 

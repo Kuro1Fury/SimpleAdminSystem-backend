@@ -7,6 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.stereotype.Controller;
 
+import javax.annotation.Resource;
 import java.util.List;
 import java.util.Map;
 
@@ -40,6 +41,17 @@ public class UserController {
         }
 
         return Result.fail(20002, "Username or Password failed!");
+    }
+
+    @GetMapping("info")
+    public Result<Map<String, Object>> getUserInfo(@RequestParam("token") String token) {
+        // Get the user information by token from Redis
+        Map<String, Object> data = userService.getUserInfo(token);
+
+        if (data != null) {
+            return Result.success(data);
+        }
+        return Result.fail(20003, "login expired, please login again!");
     }
 
 }
